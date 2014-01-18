@@ -25,12 +25,15 @@
 */
 //###################################################################################################
 
+using Backend.Data;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Media;
 
 namespace Chat.UI.Converter
 {
@@ -189,6 +192,22 @@ namespace Chat.UI.Converter
             catch (Exception uiEx) { Frontend.UIError(uiEx); }
             
             return FlowDirection.LeftToRight;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) { return null; }
+    }
+
+    public class BoolToEncryptionConverter : IValueConverter
+    {
+        private App Frontend { get { return (App)App.Current; } }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            ConversationMessage msg = (ConversationMessage) value;
+            if (msg.IsEncrypted)
+                return new SolidColorBrush(Windows.UI.Colors.Green);
+            else
+                return new SolidColorBrush(Windows.UI.Colors.Red);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) { return null; }

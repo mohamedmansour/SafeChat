@@ -66,7 +66,8 @@
             <converter:OverlayColorPressed x:Key="OverlayColorPressed" />
             <converter:OverlayColorDisabled x:Key="OverlayColorDisabled" />
             <converter:RichMessageParser x:Key="RichMessageParser" />
-            
+            <converter:BoolToEncryptionConverter x:Name="BoolToEnc" />
+
             <!-- ==================================         Colors         ================================== -->
 
             <!-- Status -->
@@ -365,6 +366,13 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <Style x:Key="ConversationBox" TargetType="RichTextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="IsTextSelectionEnabled" Value="True"/>
             </Style>
 
             <!-- ==================================         Roster ListViewItem        ================================== -->
@@ -826,7 +834,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

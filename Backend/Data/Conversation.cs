@@ -55,6 +55,7 @@ namespace Backend.Data
 
         public DateTime Timestamp { get; private set; }
         public string Body { get; private set; }
+        public bool IsEncrypted { get; set; }
     }
 
     public class ConversationItem

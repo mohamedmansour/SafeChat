@@ -315,6 +315,10 @@
       <Project>{455672ea-c8a2-4a8c-8634-4fed95a8a7b3}</Project>
       <Name>BackgroundTasks</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WinStoreOTRLib\WinStoreOTRLib.csproj">
+      <Project>{3fbaf393-c08f-4765-845d-5de9bfcd80b3}</Project>
+      <Name>WinStoreOTRLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XMPP\XMPP.csproj">
       <Project>{ecb98ce1-38b8-4a34-bf26-76ed553f4fb6}</Project>
       <Name>XMPP</Name>

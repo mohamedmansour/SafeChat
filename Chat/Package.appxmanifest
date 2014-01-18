@@ -102,6 +102,7 @@
           <m2:Rotation Preference="landscapeFlipped" />
         </m2:InitialRotationPreference>
         <m2:SplashScreen BackgroundColor="#FFFFFF" Image="Assets\SplashScreen.png" />
+        <m2:ApplicationView MinWidth="width320" />
       </m2:VisualElements>
     </Application>
   </Applications>

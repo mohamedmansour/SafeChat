@@ -60,6 +60,16 @@ namespace Chat.Frontend
             {
                 sessionManager.EncryptMessage(jid, outgoingMsg);
             }
+            callback(outgoingMsg);
+        }
+
+        private void log(string msg)
+        {
+            
+            if (sessionOutgoingDelegate != null)
+            {
+                sessionOutgoingDelegate("DEBUG::" + msg);
+            }
         }
 
         private void OnOTRMangerEventHandler(object source, OTREventArgs e)
@@ -76,17 +86,21 @@ namespace Chat.Frontend
                     break;
                 case OTR_EVENT.SEND:
                     XMPPHelper.SendMessage(me, e.GetSessionID(), e.GetMessage());
+                    log("Sent encrypted message " + e.GetSessionID());
                     break;
                 case OTR_EVENT.READY:
+                    log("Encryption Session Active with " + e.GetSessionID());
                     sessionManager.EncryptMessage(e.GetSessionID(), e.GetMessage());
                     break;
                 case OTR_EVENT.ERROR:
+                    log("Error happened, closing all sessions ");
                     sessionManager.CloseAllSessions();
                     sessionManager = null;
                     break;
                 case OTR_EVENT.DEBUG:
                     break;
                 case OTR_EVENT.CLOSED:
+                    log("Closed Session ");
                     sessionManager.CloseAllSessions();
                     sessionManager = null;
                     break;

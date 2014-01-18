@@ -179,7 +179,7 @@ namespace Chat.Frontend
             catch (Exception uiEx) { Frontend.UIError(uiEx); }
         }
 
-        public static Tags.jabber.client.message SendLowLevelMessage(string from, string to, string content)
+        public static Tags.jabber.client.message ConstructMessage(string from, string to, string content)
         {
             var message = new Tags.jabber.client.message();
             message.to = to;
@@ -192,8 +192,6 @@ namespace Chat.Frontend
 
             message.Timestamp = DateTime.Now;
             message.Account = from;
-
-            Frontend.Backend.SendTag(from, message);
 
             return message;
         }

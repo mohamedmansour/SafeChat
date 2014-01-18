@@ -427,11 +427,11 @@ namespace Chat.UI.Controls
                                 {
                                     Frontend.OTR.outgoing(self.jid, other.CurrentJID, SendText.Text, (string encryptedText) =>
                                     {
-                                        var message = XMPPHelper.SendMessage(self.jid, other.CurrentJID, encryptedText);
+                                        var message = XMPPHelper.ConstructMessage(self.jid, other.CurrentJID, encryptedText);
                                         if (message != null)
                                         {
-                                            message.from = message.Account;
-                                            CurrentConversation.AddMessage(new OTRMessage(message));
+                                        //    message.from = message.Account;
+                                        CurrentConversation.AddMessage(new OTRMessage(message));
                                         }
 
                                         SendText.Text = string.Empty;

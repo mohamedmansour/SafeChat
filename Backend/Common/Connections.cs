@@ -153,7 +153,11 @@ namespace Backend.Common
 
                     parameters.UpdatedSettings = server.ResetChangedState();
 
-                    if (parameters.RequestConnectedStandby && BackgroundExecutionManager.GetAccessStatus() != BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity)
+                    var ret = BackgroundExecutionManager.GetAccessStatus();
+                    var isAllowed = (ret == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity
+                        || ret == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity);
+
+                    if (parameters.RequestConnectedStandby && !isAllowed)
                         _backend.OnConnectionEvent(this, new ConnectionEvent(new BackendEventError(parameters.JID, ErrorType.NoHardwareSlotsAllowed, ErrorPolicyType.Deactivate)));
 
                     // Add new server

@@ -122,7 +122,15 @@ namespace Backend
 
         private bool _isInitialized = false;
         private ManualResetEvent _settingMutex = new ManualResetEvent(true);
-        private bool _hasBackgroundAccess { get { return (BackgroundExecutionManager.GetAccessStatus() == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity); } }
+        private bool _hasBackgroundAccess
+        {
+            get
+            {
+                var ret = BackgroundExecutionManager.GetAccessStatus();
+                return (ret == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity 
+                    || ret == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity);
+            }
+        }
         private bool _hasRegisteredSystemEvents  { get { return (BackgroundTaskRegistration.AllTasks.Count >= 9); } } // 9 is the current count of background tasks we use apart from ControlChannels
 
 

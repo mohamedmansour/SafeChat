@@ -49,11 +49,17 @@ namespace OTR.Utilities
              //http://tools.ietf.org/html/rfc2104
             // http://msdn.microsoft.com/en-us/library/system.security.cryptography.hmacsha256.aspx
 
-            HMACSHA256 sha_256_hmac_keyed = null;
-           
-            sha_256_hmac_keyed = new HMACSHA256(key);
-           
-           return sha_256_hmac_keyed.ComputeHash(data_byte_array);
+            MacAlgorithmProvider provider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+
+            var keyMaterial = CryptographicBuffer.CreateFromByteArray(key);
+            var cryptoKey = provider.CreateKey(keyMaterial);
+
+            var data = CryptographicBuffer.CreateFromByteArray(data_byte_array);
+            var signedBuff = CryptographicEngine.Sign(cryptoKey, data);
+
+            var hashByteArr = new byte[signedBuff.Length];
+            CryptographicBuffer.CopyToByteArray(signedBuff, out hashByteArr);
+            return hashByteArr;
 
         }
        
@@ -78,13 +84,18 @@ namespace OTR.Utilities
         {
             /* No need to reverse as all data are already encoded including the keys */
             /* Most of the keys are derived for sec_data_encoded_mpi */
-            
 
-            
-            HMACSHA1 sha_1_hmac_keyed = new HMACSHA1(key);
+            MacAlgorithmProvider provider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha1);
 
-            return sha_1_hmac_keyed.ComputeHash(data_byte_array);
+            var keyMaterial = CryptographicBuffer.CreateFromByteArray(key);
+            var cryptoKey = provider.CreateKey(keyMaterial);
 
+            var data = CryptographicBuffer.CreateFromByteArray(data_byte_array);
+            var signedBuff = CryptographicEngine.Sign(cryptoKey, data);
+
+            var hashByteArr = new byte[signedBuff.Length];
+            CryptographicBuffer.CopyToByteArray(signedBuff, out hashByteArr);
+            return hashByteArr;
         }
         
         public static byte[] AESGetEncrypt(byte[] key, byte[] plain_data_array, UInt64 counter)

@@ -49,13 +49,13 @@ namespace OTRTest
             _alice_convo_array = new string[3];
             _bob_convo_array = new string[3];
 
-            _alice_convo_array[0] = "Do I look like a cow?";
-            _alice_convo_array[1] = ":( great";
+            _alice_convo_array[0] = "What are we doing?";
+            _alice_convo_array[1] = "So this is what hacking feels like?";
             _alice_convo_array[2] = "Be nice! That's mean.";
 
-            _bob_convo_array[0] = "Moo";
-            _bob_convo_array[1] = "Mooooo";
-            _bob_convo_array[2] = "Omfg! Those were the worst autocorrects EVER!!! I said Noo, I swear to god.";
+            _bob_convo_array[0] = "Hacking";
+            _bob_convo_array[1] = "Huh?";
+            _bob_convo_array[2] = "Sure ...";
 
             _alice_convo_pos = 0;
             _bob_convo_pos = 0;

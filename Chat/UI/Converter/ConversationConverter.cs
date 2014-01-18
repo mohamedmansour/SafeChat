@@ -1,0 +1,232 @@
+﻿//###################################################################################################
+/*
+    Copyright (c) since 2012 - Paul Freund 
+    
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+    
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+*/
+//###################################################################################################
+
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Documents;
+
+namespace Chat.UI.Converter
+{
+    public class RichMessageParser : IValueConverter
+    {
+        private App Frontend { get { return (App)App.Current; } }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var source = (value as string) ?? string.Empty;
+            try
+            {
+                return Parse(source);
+            }
+            catch (Exception uiEx) { Frontend.UIError(uiEx); }
+
+            var p = new Paragraph();
+            p.Inlines.Add(new Run() { Text = source });
+            return p;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+
+        private Block Parse(string source)
+        {
+            const string UrlRegex = @"(http|https)://([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?";
+            var urls = Regex.Matches(source, UrlRegex);
+
+            var block = new Paragraph();
+            int lastBlockEnd = -1;
+
+            foreach (var match in urls.Cast<Match>())
+            {
+                if (match.Index > lastBlockEnd)
+                {
+                    block.Inlines.Add(new Run
+                    {
+                        Text = source.Substring(lastBlockEnd + 1, match.Index - (lastBlockEnd + 1))
+                    });
+                }
+
+                if (Uri.IsWellFormedUriString(match.Value, UriKind.Absolute))
+                {
+                    var uri = new Uri(match.Value);
+
+                    // In theory this should be done with Windows.UI.Xaml.Documents.Hyperlink,
+                    // but in practice that class doesn't seem to exist outside of the documentation.
+                    // This is a hopefully temporary hack until MS fixes that.
+                    var button = new Windows.UI.Xaml.Controls.HyperlinkButton
+                    {
+                        NavigateUri = uri,
+                        Content = new Windows.UI.Xaml.Controls.TextBlock 
+                        {
+                            Text = match.Value,
+                            TextWrapping = TextWrapping.Wrap
+                        },
+                        Style = Frontend.Resources["ConversationHyperlink"] as Style
+                    };
+
+                    block.Inlines.Add(new InlineUIContainer
+                    {
+                        Child = button                        
+                    });
+                }
+                else
+                {
+                    block.Inlines.Add(new Run
+                    {
+                        Text = source.Substring(match.Index, match.Length)
+                    });
+                }
+
+                lastBlockEnd = match.Index + match.Length;
+            }
+
+            if (lastBlockEnd < source.Length - 1)
+            {
+                block.Inlines.Add(new Run
+                {
+                    Text = source.Substring(lastBlockEnd + 1)
+                });
+            }
+
+            return block;
+        }
+    }
+
+    public class MessageTextAlignChooser : IValueConverter
+    {
+        private App Frontend { get { return (App)App.Current; } }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var settings = Frontend.Settings;
+
+            try
+            {
+                if (settings.invertOwnMessages)
+                {
+                    var sender = (Backend.Data.Contact)value;
+                    if (sender != null)
+                    {
+                        if (sender.jid == sender.account) // This is the account
+                            return TextAlignment.Left;
+                        else
+                            return TextAlignment.Right;
+                    }
+                }
+            }
+            catch (Exception uiEx) { Frontend.UIError(uiEx); }
+            
+            return TextAlignment.Left;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) { return null; }
+    }
+
+    public class MessageFlowDirectionChooser : IValueConverter
+    {
+        private App Frontend { get { return (App)App.Current; } }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var settings = Frontend.Settings;
+
+            try
+            {
+                if (settings.invertOwnMessages)
+                {
+                    var sender = value as Backend.Data.ConversationSender;
+                    if (sender != null)
+                    {
+                        string contact = sender.Sender;
+                        string account = sender.Account;
+                        if (!string.IsNullOrEmpty(contact) && !string.IsNullOrEmpty(account))
+                        {
+                            var accountObj = Frontend.Accounts[account];
+                            if (account != null)
+                            {
+                                var contactObj = accountObj.Roster[contact];
+                                if (contactObj != null)
+                                {
+                                    if (contactObj.jid == contactObj.account) // This is the account
+                                        return FlowDirection.RightToLeft;
+                                    else
+                                        return FlowDirection.LeftToRight;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception uiEx) { Frontend.UIError(uiEx); }
+            
+            return FlowDirection.LeftToRight;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) { return null; }
+    }
+    
+    public class JIDToImageConverter : IValueConverter
+    {
+        private App Frontend { get { return (App)App.Current; } }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            try
+            {
+                var sender = value as Backend.Data.ConversationSender;
+                if (sender != null)
+                {
+                    string contact = sender.Sender;
+                    string account = sender.Account;
+                    if (!string.IsNullOrEmpty(contact) && !string.IsNullOrEmpty(account))
+                    {
+                        var accountObj = Frontend.Accounts[account];
+                        if (account != null)
+                        {
+                            var contactObj = accountObj.Roster[contact];
+                            if (contactObj != null)
+                                return contactObj.ImageData;
+                        }
+                    }
+                }
+
+                return Backend.Data.Avatar.GetFileURI("");
+            }
+            catch (Exception uiEx) { Frontend.UIError(uiEx); }
+
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) { return null; }
+    }
+    
+}

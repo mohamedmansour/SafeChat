@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
+  <Identity Name="8746MohamedMansour.TrustedChat" Publisher="CN=87902EF4-764E-4CA8-9295-537789EDE8CF" Version="1.1.0.0" />
+  <Properties>
+    <DisplayName>Trusted Chat</DisplayName>
+    <PublisherDisplayName>Mohamed Mansour</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="Chat.App" Executable="$targetnametoken$.exe" EntryPoint="Chat.App">
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.ServicingComplete">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.PushNotificationTrigger">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.KeepAliveTrigger">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.InternetAvailable">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.InternetNotAvailable">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.UserPresent">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.UserAway">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.SessionConnected">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.ControlChannelReset">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.LockScreenApplicationAdded">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.LockScreenApplicationRemoved">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="BackgroundTasks.TimeZoneChange">
+          <BackgroundTasks>
+            <Task Type="controlChannel" />
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
+      <m2:VisualElements DisplayName="Trusted Chat" Description="XMPP Client with Support for Facebook Chat and Google Talk" BackgroundColor="#FFFFFF" ForegroundText="dark" ToastCapable="true" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png">
+        <m2:DefaultTile ShortName="Chat" Wide310x150Logo="Assets\WideLogo.png">
+          <m2:ShowNameOnTiles>
+            <m2:ShowOn Tile="square150x150Logo" />
+            <m2:ShowOn Tile="wide310x150Logo" />
+          </m2:ShowNameOnTiles>
+        </m2:DefaultTile>
+        <m2:LockScreen Notification="badge" BadgeLogo="Assets\BadgeIcon.png" />
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="portrait" />
+          <m2:Rotation Preference="landscape" />
+          <m2:Rotation Preference="portraitFlipped" />
+          <m2:Rotation Preference="landscapeFlipped" />
+        </m2:InitialRotationPreference>
+        <m2:SplashScreen BackgroundColor="#FFFFFF" Image="Assets\SplashScreen.png" />
+      </m2:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>

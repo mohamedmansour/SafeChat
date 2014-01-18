@@ -14,6 +14,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto.Generators;
+using Windows.Security.Cryptography.Core;
 
 
 
@@ -34,11 +35,14 @@ namespace OTR.Utilities
             throw new ArgumentException("GetSHA256: Data to be hashed be null/empty");
 
 
-            SHA256Managed _sha256_hash = new SHA256Managed();
+            HashAlgorithmProvider provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
 
-           
-            return _sha256_hash.ComputeHash(byte_array);
+            var ibuff = CryptographicBuffer.CreateFromByteArray(byte_array);
+            var hashbuff = provider.HashData(ibuff);
 
+            var hashByteArr = new byte[hashbuff.Length];
+            CryptographicBuffer.CopyToByteArray(hashbuff, out hashByteArr);
+            return hashByteArr;
         }
         public static byte[] SHA256GetKeyedHash(byte[] key, byte[] data_byte_array)
         {
@@ -60,12 +64,15 @@ namespace OTR.Utilities
                 throw new ArgumentException("GetSHA1: Data to be hashed be null/empty");
 
             /* No need to reverse as all data are already encoded*/
-            
-            
 
-            SHA1Managed _sha_1_hash = new SHA1Managed();
+            HashAlgorithmProvider provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
 
-            return _sha_1_hash.ComputeHash(byte_array);
+            var ibuff = CryptographicBuffer.CreateFromByteArray(byte_array);
+            var hashbuff = provider.HashData(ibuff);
+
+            var hashByteArr = new byte[hashbuff.Length];
+            CryptographicBuffer.CopyToByteArray(hashbuff, out hashByteArr);
+            return hashByteArr;
         }
         public static byte[] SHA1GetKeyedHash(byte[] key, byte[] data_byte_array)
         {
@@ -209,13 +216,7 @@ namespace OTR.Utilities
             if (private_key_length_bits < OTRConstants.DH_PRIVATE_KEY_MINIMUM_LENGTH_BITS)
                 throw new ArgumentException("GetRandBigInt: Key length cannot be less than " + OTRConstants.DH_PRIVATE_KEY_MINIMUM_LENGTH_BITS.ToString());
 
-            if (_random_crypt_prov == null)
-             _random_crypt_prov = new RNGCryptoServiceProvider();
-
-            byte[] _random_bytes = new byte[private_key_length_bits / 8];
-
-            _random_crypt_prov.GetBytes(_random_bytes);
-
+            byte[] _random_bytes = GetRandomByteArray(private_key_length_bits / 8);
             BigInteger _big_int_val = new BigInteger(_random_bytes);
 
             if (_big_int_val.Sign == -1)
@@ -341,7 +342,7 @@ namespace OTR.Utilities
 
 
             if (_length_byte_array.Length != _type_length)
-                throw new ApplicationException("EncodeOTRBytes: Expected array of length " + _type_length.ToString());
+                throw new InvalidDataException("EncodeOTRBytes: Expected array of length " + _type_length.ToString());
 
 
             out_byte_array = new byte[_length_byte_array.Length + _byte_array.Length];
@@ -393,12 +394,12 @@ namespace OTR.Utilities
             int _data_array_length = BitConverter.ToInt32(_int_32_length, 0);
 
             if (_data_array_length < 1)
-                throw new ApplicationException("DecoupleTypeFromBytes: The length of the data sub array in the in byte array is less than 1");
+                throw new InvalidDataException("DecoupleTypeFromBytes: The length of the data sub array in the in byte array is less than 1");
 
             _next_start_index = _data_array_length + start_index + _type_length;
 
             if (_next_start_index > in_byte_array.Length)
-                throw new ApplicationException("DecoupleTypeFromBytes: The extracted data length value exceeds the length of the byte array");
+                throw new InvalidDataException("DecoupleTypeFromBytes: The extracted data length value exceeds the length of the byte array");
 
             out_byte_array = new byte[_data_array_length + _type_length];
 
@@ -467,13 +468,13 @@ namespace OTR.Utilities
 
 
             if (_data_array_length < 1)
-                throw new ApplicationException("DecodeOTRBytes: The length of the data sub array in the in byte array is less than 1");
+                throw new InvalidDataException("DecodeOTRBytes: The length of the data sub array in the in byte array is less than 1");
 
             _next_start_index = _data_array_length + start_index + _type_length;
 
 
             if (_next_start_index > in_byte_array.Length)
-                throw new ApplicationException("DecodeOTRBytes: The extracted data length value exceeds the length of the byte array");
+                throw new InvalidDataException("DecodeOTRBytes: The extracted data length value exceeds the length of the byte array");
 
             out_byte_array = new byte[_data_array_length];
 
@@ -585,13 +586,13 @@ namespace OTR.Utilities
 
 
             if (_data_array_length < 1)
-                throw new ApplicationException("DecodeBytesBE: The length of the data sub array in the in byte array is less than 1");
+                throw new InvalidDataException("DecodeBytesBE: The length of the data sub array in the in byte array is less than 1");
 
             _next_start_index = _data_array_length + start_index + _type_length;
 
 
             if (_next_start_index > in_byte_array.Length)
-                throw new ApplicationException("DecodeBytesBE: The extracted data length value exceeds the length of the byte array");
+                throw new InvalidDataException("DecodeBytesBE: The extracted data length value exceeds the length of the byte array");
 
             out_byte_array = new byte[_data_array_length];
 
@@ -632,7 +633,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRCtr:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRCtr:" + ex.ToString());
 
             }
 
@@ -667,7 +668,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeCtrFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecodeCtrFromBytes:" + ex.ToString());
 
             }
 
@@ -701,7 +702,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRMac:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRMac:" + ex.ToString());
 
             }
 
@@ -738,7 +739,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeMacFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecodeMacFromBytes:" + ex.ToString());
 
             }
 
@@ -757,7 +758,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRBytes:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRBytes:" + ex.ToString());
 
             }
 
@@ -774,7 +775,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeByteFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecodeByteFromBytes:" + ex.ToString());
 
             }
 
@@ -798,7 +799,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeMpiBytes:" + ex.ToString());
+                throw new InvalidDataException("EncodeMpiBytes:" + ex.ToString());
 
             }
 
@@ -825,7 +826,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeMpiBytes:" + ex.ToString());
+                throw new InvalidDataException("EncodeMpiBytes:" + ex.ToString());
 
             }
 
@@ -844,7 +845,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeMpiFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecodeMpiFromBytes:" + ex.ToString());
 
             }
 
@@ -877,7 +878,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecoupleMpiFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecoupleMpiFromBytes:" + ex.ToString());
 
             }
 
@@ -974,7 +975,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeMpiBytes:" + ex.ToString());
+                throw new InvalidDataException("EncodeMpiBytes:" + ex.ToString());
 
             }
 
@@ -1014,7 +1015,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeMpiBytes:" + ex.ToString());
+                throw new InvalidDataException("EncodeMpiBytes:" + ex.ToString());
 
             }
 
@@ -1033,7 +1034,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeMpiFromBytesBigEndian:" + ex.ToString());
+                throw new InvalidDataException("DecodeMpiFromBytesBigEndian:" + ex.ToString());
 
             }
 
@@ -1071,7 +1072,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRInt:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRInt:" + ex.ToString());
 
             }
 
@@ -1088,7 +1089,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeIntFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecodeIntFromBytes:" + ex.ToString());
 
             }
 
@@ -1109,7 +1110,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRShort:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRShort:" + ex.ToString());
 
             }
 
@@ -1127,7 +1128,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeShortFromByte:" + ex.ToString());
+                throw new InvalidDataException("DecodeShortFromByte:" + ex.ToString());
 
             }
 
@@ -1146,7 +1147,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRData:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRData:" + ex.ToString());
 
             }
 
@@ -1165,7 +1166,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeDataFromByte:" + ex.ToString());
+                throw new InvalidDataException("DecodeDataFromByte:" + ex.ToString());
 
             }
 
@@ -1183,7 +1184,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecoupleDataFromBytes:" + ex.ToString());
+                throw new InvalidDataException("DecoupleDataFromBytes:" + ex.ToString());
 
             }
 
@@ -1202,7 +1203,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeOTRDataBE:" + ex.ToString());
+                throw new InvalidDataException("EncodeOTRDataBE:" + ex.ToString());
 
             }
 
@@ -1221,7 +1222,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeDataFromByteBE:" + ex.ToString());
+                throw new InvalidDataException("DecodeDataFromByteBE:" + ex.ToString());
 
             }
 
@@ -1327,7 +1328,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeTLV:" + ex.ToString());
+                throw new InvalidDataException("DecodeTLV:" + ex.ToString());
 
             }
 
@@ -1371,7 +1372,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecoupleTLV:" + ex.ToString());
+                throw new InvalidDataException("DecoupleTLV:" + ex.ToString());
 
             }
 
@@ -1398,7 +1399,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVPadding:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVPadding:" + ex.ToString());
 
             }
 
@@ -1431,7 +1432,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("DecodeTLVPadding:" + ex.ToString());
+                throw new InvalidDataException("DecodeTLVPadding:" + ex.ToString());
 
             }
 
@@ -1458,7 +1459,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVExtraSymKey:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVExtraSymKey:" + ex.ToString());
 
             }
 
@@ -1477,7 +1478,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVDisconnected:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVDisconnected:" + ex.ToString());
 
             }
 
@@ -1497,7 +1498,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVDisconnected:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVDisconnected:" + ex.ToString());
 
             }
 
@@ -1515,7 +1516,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVSMPAbort:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVSMPAbort:" + ex.ToString());
 
             }
 
@@ -1573,7 +1574,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVSMPMessage:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVSMPMessage:" + ex.ToString());
 
             }
         }
@@ -1622,7 +1623,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("EncodeTLVSMPMessage:" + ex.ToString());
+                throw new InvalidDataException("EncodeTLVSMPMessage:" + ex.ToString());
 
             }
 
@@ -1708,7 +1709,7 @@ namespace OTR.Utilities
             catch (Exception ex)
             {
 
-                throw new ApplicationException("SetSecByteMpi:" + ex.ToString());
+                throw new InvalidDataException("SetSecByteMpi:" + ex.ToString());
 
             }
 

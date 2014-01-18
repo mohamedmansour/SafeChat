@@ -19,47 +19,47 @@ namespace Chat.Frontend
         private OutgoingDelegate sessionOutgoingDelegate = null;
         private OTRSessionManager sessionManager = null;
 
+        string me = null;
         string jid = null;
-        OTRMessage message = null;
+        Tags.jabber.client.message message = null;
         public OTRManager()
         {
         }
 
         public void incoming(Tags.jabber.client.message incomingMessage, IncomingDelegate callback)
         {
-            sessionIncomingDelegate = callback; 
-            jid = incomingMessage.from;
-
             if (sessionManager == null)
             {
-                sessionManager = new OTRSessionManager(incomingMessage.to);
+                sessionIncomingDelegate = callback;
+                message = incomingMessage;
+                me = incomingMessage.to;
+                jid = incomingMessage.from;
+                sessionManager = new OTRSessionManager(me);
                 sessionManager.OnOTREvent += new OTREventHandler(OnOTRMangerEventHandler);
                 sessionManager.CreateOTRSession(jid);
-                //sessionManager.RequestOTRSession(jid, OTRSessionManager.GetSupportedOTRVersionList()[0]);
-                message = new OTRMessage(incomingMessage);
             }
-            
-            
             sessionManager.ProcessOTRMessage(jid, incomingMessage.body);
-            
+            //var otr = new OTRMessage(incomingMessage);
+            //otr.UpdatedBodyElements = new string[] { "WHATSUP!" };
+            //callback(otr); 
         }
 
         public void outgoing(string selfJID, string otherJID, string message, OutgoingDelegate callback)
         {
-            sessionOutgoingDelegate = callback;
-            jid = otherJID;
-
-            if (sessionManager == null || !sessionManager.IsSessionValid(jid))
+            if (sessionManager == null)
             {
-                sessionManager = new OTRSessionManager(selfJID);
+                sessionOutgoingDelegate = callback;
+                me = selfJID;
+                jid = otherJID;
+                sessionManager = new OTRSessionManager(me);
                 sessionManager.OnOTREvent += new OTREventHandler(OnOTRMangerEventHandler);
-                sessionManager.CreateOTRSession(otherJID);
-                sessionManager.RequestOTRSession(otherJID, OTRSessionManager.GetSupportedOTRVersionList()[0]);
+                sessionManager.CreateOTRSession(jid);
+                sessionManager.RequestOTRSession(jid, OTRSessionManager.GetSupportedOTRVersionList()[0]);
             }
-            
-            //    sessionManager.EncryptMessage(otherJID, message);
-            
-            //callback("ENCRYPTED" + message);
+            else
+            {
+                sessionManager.EncryptMessage(jid, message);
+            }
         }
 
         private void OnOTRMangerEventHandler(object source, OTREventArgs e)
@@ -67,24 +67,16 @@ namespace Chat.Frontend
             switch (e.GetOTREvent())
             {
                 case OTR_EVENT.MESSAGE:
-                    //log.Text += String.Format("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-                    //_bob_otr_session_manager.EncryptMessage(_bob_my_buddy_unique_id, "Hello");
-                    if (sessionIncomingDelegate != null)
+                    if (sessionOutgoingDelegate != null)
                     {
-                        message.UpdatedBodyElements = new string[] {e.GetMessage()};
-                        sessionIncomingDelegate(message);
-                        sessionIncomingDelegate = null;
+                        sessionOutgoingDelegate(e.GetMessage());
                     }
                     break;
                 case OTR_EVENT.SEND:
-                    message.UpdatedBodyElements = new string[] {e.GetMessage()};
-                    XMPPHelper.SendMessage(message.to, message.from, e.GetMessage());      
+                    XMPPHelper.SendMessage(me, e.GetSessionID(), e.GetMessage());
                     break;
                 case OTR_EVENT.READY:
-                    if (sessionOutgoingDelegate != null)
-                    {
-                        sessionManager.EncryptMessage(jid, e.GetMessage());
-                    }
+                    sessionManager.EncryptMessage(e.GetSessionID(), e.GetMessage());
                     break;
                 case OTR_EVENT.ERROR:
                     break;

@@ -179,11 +179,31 @@ namespace Chat.Frontend
             catch (Exception uiEx) { Frontend.UIError(uiEx); }
         }
 
+        public static Tags.jabber.client.message SendLowLevelMessage(string from, string to, string content)
+        {
+            var message = new Tags.jabber.client.message();
+            message.to = to;
+            message.from = from;
+            message.type = Tags.jabber.client.message.typeEnum.chat;
+
+            var body = new Tags.jabber.client.body();
+            body.Value = content;
+            message.Add(body);
+
+            message.Timestamp = DateTime.Now;
+            message.Account = from;
+
+            Frontend.Backend.SendTag(from, message);
+
+            return message;
+        }
+
         public static Tags.jabber.client.message SendMessage(string from, string to, string content)
         {
             try
             {
-                var account = Frontend.Accounts[from];
+                var account = Frontend.Accounts[0];
+                from = account.jid;
                 if (account != null)
                 {
                     var message = new Tags.jabber.client.message();

@@ -52,6 +52,8 @@ namespace Chat
         public Settings Settings = new Settings();
         public Accounts Accounts = new Accounts();
         public Notifications Notifications = null;
+        public OTRManager OTR = new OTRManager();
+
 
         public AppColors AppColors
         {

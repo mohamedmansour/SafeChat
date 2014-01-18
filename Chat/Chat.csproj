@@ -116,6 +116,7 @@
     <Compile Include="Frontend\Events.cs" />
     <Compile Include="Frontend\Interpreter.cs" />
     <Compile Include="Frontend\OTRManager.cs" />
+    <Compile Include="Frontend\Tags.cs" />
     <Compile Include="Frontend\XMPPHelper.cs" />
     <Compile Include="UI\Controls\AvatarControl.xaml.cs">
       <DependentUpon>AvatarControl.xaml</DependentUpon>

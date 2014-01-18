@@ -109,6 +109,7 @@
     <Compile Include="Data\Avatar.cs" />
     <Compile Include="Data\Conversation.cs" />
     <Compile Include="Data\Colors.cs" />
+    <Compile Include="Data\OTRMessage.cs" />
     <Compile Include="Data\Settings.cs" />
     <Compile Include="Data\Status.cs" />
     <Compile Include="Runtime.cs" />

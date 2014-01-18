@@ -216,21 +216,22 @@ namespace Chat.Frontend
 
                             contact.SetLastSender(from.Resource);
 
-                            if (account.OwnContact != null && contact != null)
-                            {
-                                if (!account.CurrentConversations.Keys.Contains(from.Bare))
-                                    account.CurrentConversations[from.Bare] = new Conversation(account.OwnContact.jid, contact.jid);
+                            Frontend.OTR.incoming(message, (OTRMessage decryptedMessage) => {
+                                if (account.OwnContact != null && contact != null)
+                                {
+                                    if (!account.CurrentConversations.Keys.Contains(from.Bare))
+                                        account.CurrentConversations[from.Bare] = new Conversation(account.OwnContact.jid, contact.jid);
 
-                                account.CurrentConversations[from.Bare].AddMessage(message);
-                            }
+                                    account.CurrentConversations[from.Bare].AddMessage(decryptedMessage);
+                                }
 
-                            contact.LockUpdates();
-                            contact.UnreadMessageCount++;
-                            contact.UnlockUpdates();
+                                contact.LockUpdates();
+                                contact.UnreadMessageCount++;
+                                contact.UnlockUpdates();
 
-                            Frontend.Events.MessageReceived();
-                            Frontend.Events.ContactsChanged();
-
+                                Frontend.Events.MessageReceived();
+                                Frontend.Events.ContactsChanged();
+                            });
                             return true;
                         }
                     }
@@ -240,6 +241,7 @@ namespace Chat.Frontend
             catch (Exception uiEx) { Frontend.UIError(uiEx); }
 
             return false;
+         
         }
 
         private bool Process(Tags.jabber.client.iq iq)

@@ -73,10 +73,10 @@ namespace Backend.Data
 
         public ObservableCollection<ConversationMessage> Messages { get; private set; }
 
-        public void AddMessage(Tags.jabber.client.message message)
+        public void AddMessage(OTRMessage message)
         {
-            foreach (var body in message.bodyElements) // Add all body elements 
-                Messages.Add(new ConversationMessage(message.Timestamp, body.Value));
+            foreach (var body in message.MessageBodyElements) // Add all body elements 
+                Messages.Add(new ConversationMessage(message.Timestamp, body));
         }
     }
 
@@ -95,7 +95,7 @@ namespace Backend.Data
 
         public ObservableCollection<ConversationItem> Items {get; private set; }
 
-        public void AddMessage(Tags.jabber.client.message message)
+        public void AddMessage(OTRMessage message)
         {
             JID senderJid = new JID(message.from);
             string sender = null;

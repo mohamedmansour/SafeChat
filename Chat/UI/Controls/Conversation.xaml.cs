@@ -429,7 +429,7 @@ namespace Chat.UI.Controls
                                     if (message != null)
                                     {
                                         message.from = message.Account;
-                                        CurrentConversation.AddMessage(message);
+                                        CurrentConversation.AddMessage(new OTRMessage(message));
                                     }
 
                                     SendText.Text = string.Empty;

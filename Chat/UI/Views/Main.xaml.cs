@@ -197,7 +197,7 @@ namespace Chat.UI.Views
                         NoAccountsOverlay.Visibility = Visibility.Collapsed;
 
                     // Snapping
-                    if (ApplicationView.Value == ApplicationViewState.Snapped) // Snapped
+                    if (ApplicationView.Value == ApplicationViewState.FullScreenPortrait) // Snapped
                     {
                         if (SelectedContact != null) // Contact Selected
                         {
@@ -300,7 +300,7 @@ namespace Chat.UI.Views
 
                 AppBar.IsOpen = false;
 
-                if (ApplicationView.Value == ApplicationViewState.Snapped)
+                if (ApplicationView.Value == ApplicationViewState.FullScreenPortrait)
                 {
                     ApplicationView.TryUnsnap();
                     return false;

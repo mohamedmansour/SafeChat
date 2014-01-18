@@ -120,7 +120,7 @@ namespace Chat.UI.Flyout
             Hide();
             if (Parent != null)
                 Parent.Show();
-            else if( SettingsPaneParent && ApplicationView.Value != ApplicationViewState.Snapped)
+            else if( SettingsPaneParent && ApplicationView.Value != ApplicationViewState.FullScreenPortrait)
                 SettingsPane.Show();
         }
 

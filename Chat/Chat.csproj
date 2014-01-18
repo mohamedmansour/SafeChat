@@ -214,7 +214,6 @@
     <Content Include="Assets\MediumGray.png" />
     <Content Include="Assets\DarkGray.png" />
     <Content Include="Assets\WideLogo.png" />
-    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

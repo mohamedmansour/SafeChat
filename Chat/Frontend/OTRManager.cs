@@ -28,7 +28,7 @@ namespace Chat.Frontend
 
         public void incoming(Tags.jabber.client.message incomingMessage, IncomingDelegate callback)
         {
-            sessionIncomingDelegate = callback;
+            /*sessionIncomingDelegate = callback;
             if (sessionManager == null)
             {
                 message = new OTRMessage(incomingMessage);
@@ -39,13 +39,15 @@ namespace Chat.Frontend
                 sessionManager.CreateOTRSession(jid);
             }
             sessionManager.ProcessOTRMessage(jid, incomingMessage.body);
-            //var otr = new OTRMessage(incomingMessage);
-            //otr.UpdatedBodyElements = new string[] { "WHATSUP!" };
-            //callback(otr); 
+            */var otr = new OTRMessage(incomingMessage);
+            otr.UpdatedBodyElements = new string[] { "WHATSUP!" };
+            callback(otr); 
         }
 
         public void outgoing(string selfJID, string otherJID, string outgoingMsg, OutgoingDelegate callback)
         {
+            callback(outgoingMsg);
+            /*
             sessionOutgoingDelegate = callback;
             if (sessionManager == null)
             {
@@ -59,7 +61,7 @@ namespace Chat.Frontend
             else
             {
                 sessionManager.EncryptMessage(jid, outgoingMsg);
-            }
+            }*/
         }
 
         private void OnOTRMangerEventHandler(object source, OTREventArgs e)

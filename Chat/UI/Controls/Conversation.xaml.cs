@@ -425,14 +425,17 @@ namespace Chat.UI.Controls
                             {
                                 if (!string.IsNullOrEmpty(self.jid) && !string.IsNullOrEmpty(other.CurrentJID))
                                 {
-                                    var message = XMPPHelper.SendMessage(self.jid, other.CurrentJID, SendText.Text);
-                                    if (message != null)
+                                    Frontend.OTR.outgoing(self.jid, other.CurrentJID, SendText.Text, (string encryptedText) =>
                                     {
-                                        message.from = message.Account;
-                                        CurrentConversation.AddMessage(new OTRMessage(message));
-                                    }
+                                        var message = XMPPHelper.SendMessage(self.jid, other.CurrentJID, encryptedText);
+                                        if (message != null)
+                                        {
+                                            message.from = message.Account;
+                                            CurrentConversation.AddMessage(new OTRMessage(message));
+                                        }
 
-                                    SendText.Text = string.Empty;
+                                        SendText.Text = string.Empty;
+                                    });
                                 }
                             }
                         }

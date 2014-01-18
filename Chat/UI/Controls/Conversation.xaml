@@ -165,7 +165,7 @@
                     TextWrapping="Wrap" 
                     HorizontalContentAlignment="Stretch" 
                     VerticalContentAlignment="Stretch" 
-                    KeyDown="SendText_KeyDown" 
+                    KeyUp="SendText_KeyDown" 
                     MaxLength="3000" 
                     FontSize="16" 
                     BorderThickness="0" 

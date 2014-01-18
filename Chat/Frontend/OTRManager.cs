@@ -21,17 +21,17 @@ namespace Chat.Frontend
 
         string me = null;
         string jid = null;
-        Tags.jabber.client.message message = null;
+        OTRMessage message = null;
         public OTRManager()
         {
         }
 
         public void incoming(Tags.jabber.client.message incomingMessage, IncomingDelegate callback)
         {
+            sessionIncomingDelegate = callback;
             if (sessionManager == null)
             {
-                sessionIncomingDelegate = callback;
-                message = incomingMessage;
+                message = new OTRMessage(incomingMessage);
                 me = incomingMessage.to;
                 jid = incomingMessage.from;
                 sessionManager = new OTRSessionManager(me);
@@ -44,11 +44,11 @@ namespace Chat.Frontend
             //callback(otr); 
         }
 
-        public void outgoing(string selfJID, string otherJID, string message, OutgoingDelegate callback)
+        public void outgoing(string selfJID, string otherJID, string outgoingMsg, OutgoingDelegate callback)
         {
+            sessionOutgoingDelegate = callback;
             if (sessionManager == null)
             {
-                sessionOutgoingDelegate = callback;
                 me = selfJID;
                 jid = otherJID;
                 sessionManager = new OTRSessionManager(me);
@@ -58,7 +58,7 @@ namespace Chat.Frontend
             }
             else
             {
-                sessionManager.EncryptMessage(jid, message);
+                sessionManager.EncryptMessage(jid, outgoingMsg);
             }
         }
 
@@ -67,9 +67,11 @@ namespace Chat.Frontend
             switch (e.GetOTREvent())
             {
                 case OTR_EVENT.MESSAGE:
-                    if (sessionOutgoingDelegate != null)
+                    if (sessionIncomingDelegate != null)
                     {
-                        sessionOutgoingDelegate(e.GetMessage());
+                        message.UpdatedBodyElements = new string[] { e.GetMessage() };
+                        sessionIncomingDelegate(message);
+                        sessionIncomingDelegate = null;
                     }
                     break;
                 case OTR_EVENT.SEND:
@@ -79,10 +81,14 @@ namespace Chat.Frontend
                     sessionManager.EncryptMessage(e.GetSessionID(), e.GetMessage());
                     break;
                 case OTR_EVENT.ERROR:
+                    sessionManager.CloseAllSessions();
+                    sessionManager = null;
                     break;
                 case OTR_EVENT.DEBUG:
                     break;
                 case OTR_EVENT.CLOSED:
+                    sessionManager.CloseAllSessions();
+                    sessionManager = null;
                     break;
             }
         }

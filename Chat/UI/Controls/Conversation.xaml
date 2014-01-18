@@ -53,7 +53,7 @@
                 HorizontalContentAlignment="Stretch" 
                 VerticalContentAlignment="Bottom" 
                 VerticalAlignment="Bottom" 
-                RenderTransformOrigin="0.5,0.5"  
+                RenderTransformOrigin="0.5,0.5"
             >
             <ListView.RenderTransform>
                 <CompositeTransform ScaleY="-1"/>
@@ -103,12 +103,9 @@
                                     <DataTemplate>
                                         <!-- if changing font size, remember to fix the hyperlink style in App.xaml -->
                                         <RichTextBlock 
-                                                Foreground="{Binding ContentForeground, Source={StaticResource AppColors}}" 
-                                                local:Conversation.MessageText="{Binding Body, Converter={StaticResource RichMessageParser}}" 
-                                                FontSize="16" 
-                                                TextWrapping="Wrap" 
-                                                FlowDirection="LeftToRight" 
-                                                IsTextSelectionEnabled="True" 
+                                            Style="{StaticResource ConversationBox}"
+                                            Foreground="{Binding FallbackValue=Red, Converter={StaticResource BoolToEnc}}"
+                                                local:Conversation.MessageText="{Binding Body, Converter={StaticResource RichMessageParser}}"
                                             />
                                     </DataTemplate>
                                     </ListView.ItemTemplate>
